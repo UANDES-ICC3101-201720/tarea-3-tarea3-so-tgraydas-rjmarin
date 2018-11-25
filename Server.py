@@ -12,17 +12,10 @@ s.bind(("0.0.0.0", port))
 file_folder = os.path.dirname(os.path.realpath(__file__))
 
 # Nombre Archivo, clienteIP, port, ruta
-data_file = open("datafile.txt", "r")
-
-data = []
-files = []
-
-for linea in data_file:
-	data.append(linea.split(","))
-	files.append(linea.split(",")[0])
 
 
-data_file.close()
+
+
 
 def getClient(file_name):
 	for i in data:
@@ -42,10 +35,15 @@ def download(name):
 
 
 def connection(cl):
-	print(cl[2])
 	c = cl[0]
 	addr = cl[1]
-	directory = cl[2]
+	directory = []
+	data_file = open("datafile.txt", "r")
+	data = []
+	for linea in data_file:
+		data.append(linea.split(","))
+		directory.append(linea.split(",")[0])
+	data_file.close()
 	print('Got connection from ' + str(addr[0])+ ":" + str(addr[1]))
 	c.send("Connected to server".encode())
 	opt = c.recv(1024).decode()
@@ -70,6 +68,8 @@ def connection(cl):
 		file_name = c.recv(4096).decode()
 		data_file = open("datafile.txt", "a")
 		data_file.write(file_name+","+str(addr[0])+",1234")
+		directory.append(file_name)
+		data.append([file_name, addr[0], 1234])
 		c.send("File Uploaded".encode())
 
 
@@ -81,7 +81,7 @@ name=""
 while True:
 	c, addr=s.accept()
 	print(addr)
-	x = (c, addr, files)
+	x = (c, addr)
 	one = threading.Thread(target=connection, args = (x, ))
 	one.start()
 

@@ -59,6 +59,7 @@ def connection(cl):
 					client, port = getClient(name, data)
 					var = "OK,"+str(client)+":"+str(port)+","
 					c.send(var.encode())
+					search = []
 				if name in i:
 					search.append(i)
 					continue
@@ -67,7 +68,7 @@ def connection(cl):
 	elif opt == "2":
 		file_name = c.recv(4096).decode()
 		data_file = open("datafile.txt", "a")
-		data_file.write(file_name+","+str(addr[0])+",1234")
+		data_file.write(file_name+","+str(addr[0])+",1234\n")
 		directory.append(file_name)
 		data.append([file_name, addr[0], 1234])
 		c.send("File Uploaded".encode())

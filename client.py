@@ -2,8 +2,10 @@ import socket
 import os
 import threading
 
+
 file_folder = os.path.dirname(os.path.realpath(__file__))
 print(file_folder)
+
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -56,6 +58,7 @@ def Menu(s):
                     print(inf)
                     p2p_solitude(inf.split(":")[0], int(inf.split(":")[1]), n)
                     print("file found")
+                    break
                 else:
                     printFiles(files)
         elif opt == "2":

@@ -21,6 +21,9 @@ for linea in data_file:
 	data.append(linea.split(","))
 	files.append(linea.split(",")[0])
 
+
+data_file.close()
+
 def getClient(file_name):
 	for i in data:
 		if i[0] == file_name:
@@ -44,23 +47,30 @@ def connection(cl):
 	addr = cl[1]
 	directory = cl[2]
 	print('Got connection from ' + str(addr[0])+ ":" + str(addr[1]))
-	c.send("Connected to server\nfiles to download: ".encode())
-	c.send(str(directory).encode())
-	name = ""
-	search = []
-	while name != "OK":
-		name=c.recv(1024).decode()
-		for i in directory:
-			if name == i:
-				c.send("OK".encode())
-				client, port = getClient(name)
-				c.send((str(client)+":"+str(port)).encode())
-			if name in i:
-				search.append(i)
-				continue
-		c.send(str(search).encode())
-		search=[]
-
+	c.send("Connected to server".encode())
+	opt = c.recv(1024).decode()
+	if opt == "1":
+		c.send("Files to download: ".encode())
+		c.send(str(directory).encode())
+		name = ""
+		search = []
+		while name != "OK":
+			name=c.recv(1024).decode()
+			for i in directory:
+				if name == i:
+					c.send("OK".encode())
+					client, port = getClient(name)
+					c.send((str(client)+":"+str(port)).encode())
+				if name in i:
+					search.append(i)
+					continue
+			c.send(str(search).encode())
+			search=[]
+	elif opt == "2":
+		file_name = c.recv(4096).decode()
+		data_file = open("datafile.txt", "a")
+		data_file.write(file_name+","+str(addr[0])+",1234")
+		c.send("File Uploaded".encode())
 
 
 
@@ -70,6 +80,7 @@ search=[]
 name=""
 while True:
 	c, addr=s.accept()
+	print(addr)
 	x = (c, addr, files)
 	one = threading.Thread(target=connection, args = (x, ))
 	one.start()

@@ -43,6 +43,7 @@ def Menu(s):
         opt = input("[1] Download\n[2] Upload\n[3] Exit\n")
         if opt == "1":
             s.send(opt.encode())
+            print(s.recv(1024).decode())
             printFiles(s.recv(4096).decode())
             while True:
                 name = input("name of File: ")

@@ -4,34 +4,33 @@ import threading
 
 
 file_folder = os.path.dirname(os.path.realpath(__file__))
-print(file_folder)
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def recive(name, s):
-    f = open(name, 'wb')
+    f = open(name, 'w')
     while(True):
-        l = s.recv(1024)
+        l = s.recv(256)
         if "Sent" in l.decode():
-            l = s.recv(1024).decode()
-            print(l)
+            f.write(l.decode().replace("Sent", ""))
             break
-        f.write(l)
+        else:
+            f.write(l.decode())
         if l == None:
             break
+    f.close()
 
 
 def download(name, c):
-    f = open(name, 'rb')
-    line = f.read(1024)
+    f = open(file_folder+"/"+name, 'rb')
+    line = f.read(256)
     while line:
         c.send(line)
-        line = f.read(1024)
+        line = f.read(256)
     f.close()
     c.send("Sent".encode())
-    c.send("File downloaded".encode())
 
 
 def printFiles(l):
@@ -41,38 +40,37 @@ def printFiles(l):
         print(i.strip())
 
 def Menu(s):
-    while True:
-        opt = input("[1] Download\n[2] Upload\n[3] Exit\n")
-        if opt == "1":
-            s.send(opt.encode())
-            print(s.recv(20).decode())
-            printFiles(s.recv(1024).decode())
-            while True:
-                name = input("name of File: ")
-                s.send(name.encode())
-                files = s.recv(1024).decode()
-                n = name
-                if files.split(",")[0] == "OK":
-                    # implente TCP4
-                    inf = files.split(",")[1]
-                    print(inf)
-                    p2p_solitude(inf.split(":")[0], int(inf.split(":")[1]), n)
-                    print("file found")
-                    break
-                else:
-                    printFiles(files)
-        elif opt == "2":
-            s.send(opt.encode())
-            name = input("Enter file address:\n")
-            try:
-                file = open(name, "r")
-                file.close()
-                s.send(name.encode())
-                print(s.recv(1024).decode())
-            except Exception as e:
-                print("File not found")
-        elif opt == "3":
-            break
+    opt = input("[1] Download\n[2] Upload\n[3] Exit\n")
+    if opt == "1":
+        s.send(opt.encode())
+        print(s.recv(20).decode())
+        printFiles(s.recv(1024).decode())
+        while True:
+            name = input("name of File: ")
+            s.send(name.encode())
+            files = s.recv(1024).decode()
+            n = name
+            if files.split(",")[0] == "OK":
+                # implente TCP4
+                inf = files.split(",")[1]
+                print(inf)
+                p2p_solitude(inf.split(":")[0], int(inf.split(":")[1]), n)
+                print("file found")
+                break
+            else:
+                printFiles(files)
+    elif opt == "2":
+        s.send(opt.encode())
+        name = input("Enter file address:\n")
+        try:
+            file = open(name, "r")
+            file.close()
+            s.send(name.encode())
+            print(s.recv(1024).decode())
+        except Exception as e:
+            print("File not found")
+    elif opt == "3":
+        exit()
 
 
 def p2p_solitude(ip, port, file):
@@ -98,19 +96,20 @@ def p2p():
 
 
 def client():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    host = socket.gethostname()
-    port = 12345
+    while True:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        host = socket.gethostname()
+        port = 12345
 
-    try:
-        s.connect(("192.168.0.12", port))
+        try:
+            s.connect(("192.168.0.12", port))
 
-    except Exception as e:
-        print("Error!")
-        exit(1)
-    print(s.recv(1024).decode())
-    Menu(s)
-    s.close
+        except Exception as e:
+            print("Error!")
+            exit(1)
+        print(s.recv(1024).decode())
+        Menu(s)
+        s.close
 
 
 

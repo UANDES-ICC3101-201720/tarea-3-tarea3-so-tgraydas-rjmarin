@@ -46,7 +46,7 @@ def connection(cl):
 	data_file.close()
 	print('Got connection from ' + str(addr[0])+ ":" + str(addr[1]))
 	c.send("Connected to server".encode())
-	opt = c.recv(1024).decode()
+	opt = c.recv(8).decode()
 	if opt == "1":
 		c.send("Files to download: ".encode())
 		c.send(str(directory).encode())
@@ -60,11 +60,14 @@ def connection(cl):
 					var = "OK,"+str(client)+":"+str(port)+","
 					c.send(var.encode())
 					search = []
+					name = "OK"
+					break
 				if name in i:
 					search.append(i)
 					continue
 			c.send(str(search).encode())
 			search=[]
+		c.close()
 	elif opt == "2":
 		file_name = c.recv(4096).decode()
 		data_file = open("datafile.txt", "a")

@@ -24,7 +24,7 @@ def recive(name, s):
 
 
 def download(name, c):
-    f = open(file_folder+'/'+name, 'rb')
+    f = open(name, 'rb')
     line = f.read(1024)
     while line:
         c.send(line)
@@ -82,6 +82,7 @@ def p2p_solitude(ip, port, file):
     s.connect((ip, port))
     s.send(file.encode())
     recive(file, s)
+    s.close
 
 def p2p():
     s_p2p = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -102,7 +103,7 @@ def client():
     port = 12345
 
     try:
-        s.connect(("0.0.0.0", port))
+        s.connect(("192.168.0.12", port))
 
     except Exception as e:
         print("Error!")

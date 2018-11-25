@@ -3,7 +3,7 @@ import os
 import threading
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = socket.gethostname()
-host_ip = socket.gethostbyname(host) 
+
 print (host)
 port = 12345
 s.bind(("0.0.0.0", port))

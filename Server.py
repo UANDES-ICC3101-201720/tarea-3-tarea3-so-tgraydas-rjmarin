@@ -17,7 +17,7 @@ file_folder = os.path.dirname(os.path.realpath(__file__))
 
 
 
-def getClient(file_name):
+def getClient(file_name, data):
 	for i in data:
 		if i[0] == file_name:
 			return i[1], i[2]
@@ -56,9 +56,9 @@ def connection(cl):
 			name=c.recv(1024).decode()
 			for i in directory:
 				if name == i:
-					c.send("OK".encode())
-					client, port = getClient(name)
-					c.send((str(client)+":"+str(port)).encode())
+					client, port = getClient(name, data)
+					var = "OK,"+str(client)+":"+str(port)+","
+					c.send(var.encode())
 				if name in i:
 					search.append(i)
 					continue

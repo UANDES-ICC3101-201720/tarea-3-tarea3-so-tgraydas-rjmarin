@@ -43,18 +43,18 @@ def Menu(s):
         opt = input("[1] Download\n[2] Upload\n[3] Exit\n")
         if opt == "1":
             s.send(opt.encode())
-            print(s.recv(1024).decode())
-            printFiles(s.recv(4096).decode())
+            print(s.recv(20).decode())
+            printFiles(s.recv(1024).decode())
             while True:
                 name = input("name of File: ")
                 s.send(name.encode())
                 files = s.recv(1024).decode()
                 n = name
-                if files == "OK":
+                if files.split(",")[0] == "OK":
                     # implente TCP4
-                    name = s.recv(1024).decode()
-                    inf = name.split(":")
-                    p2p_solitude(inf[0], int(inf[1].split("\n")[0]), n)
+                    inf = files.split(",")[1]
+                    print(inf)
+                    p2p_solitude(inf.split(":")[0], int(inf.split(":")[1]), n)
                     print("file found")
                 else:
                     printFiles(files)
@@ -73,6 +73,7 @@ def Menu(s):
 
 
 def p2p_solitude(ip, port, file):
+    print(ip,port)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     ip = ip.strip()
     s.connect((ip, port))
@@ -98,7 +99,7 @@ def client():
     port = 12345
 
     try:
-        s.connect(("192.168.0.17", port))
+        s.connect(("0.0.0.0", port))
 
     except Exception as e:
         print("Error!")

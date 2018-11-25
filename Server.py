@@ -15,10 +15,11 @@ file_folder = os.path.dirname(os.path.realpath(__file__))
 data_file = open("datafile.txt", "r")
 
 data = []
+files = []
 
 for linea in data_file:
 	data.append(linea.split(","))
-
+	files.append(linea.split(",")[0])
 
 def getClient(file_name):
 	for i in data:
@@ -68,9 +69,8 @@ s.listen(5)
 search=[]
 name=""
 while True:
-	directory=os.listdir(file_folder)
 	c, addr=s.accept()
-	x = (c, addr, directory)
+	x = (c, addr, files)
 	one = threading.Thread(target=connection, args = (x, ))
 	one.start()
 

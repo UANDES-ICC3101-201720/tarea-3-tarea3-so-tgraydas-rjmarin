@@ -2,11 +2,13 @@ import socket
 import os
 import threading
 
+file_folder = os.path.dirname(os.path.realpath(__file__))
+print(file_folder)
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-def recive(name):
+def recive(name, s):
     f = open(name, 'wb')
     while(True):
         l = s.recv(1024)
@@ -19,8 +21,8 @@ def recive(name):
             break
 
 
-def download(name):
-    f = open(file_folder + name, 'rb')
+def download(name, c):
+    f = open(file_folder+'/'+name, 'rb')
     line = f.read(1024)
     while line:
         c.send(line)
@@ -36,21 +38,23 @@ def Menu(s):
         name = input("name of File: ")
         s.send(name.encode())
         files = s.recv(1024).decode()
+        n = name
         if files == "OK":
             # implente TCP4
             name = s.recv(1024).decode()
             inf = name.split(":")
-            p2p_solitude(i[0], i[1], s, name)
+            p2p_solitude(inf[0], int(inf[1].split("\n")[0]), n)
             print("file found")
         else:
             print(files)
 
 
-def p2p_solitude(ip, port, s, file):
-    s.close()
-    s.connect(ip, port)
+def p2p_solitude(ip, port, file):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ip = ip.strip()
+    s.connect((ip, port))
     s.send(file.encode())
-    recive(file)
+    recive(file, s)
 
 def p2p():
     s_p2p = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -61,7 +65,7 @@ def p2p():
     while True:
         c, addr = s_p2p.accept()
         name = c.recv(1024).decode()
-        download(name)
+        download(name, c)
         c.close()
 
 
@@ -71,7 +75,7 @@ def client():
     port = 12345
 
     try:
-        s.connect(("127.0.0.1", port))
+        s.connect(("192.168.0.17", port))
 
     except Exception as e:
         print("Error!")

@@ -3,8 +3,10 @@ import os
 import threading
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = socket.gethostname()
+host_ip = socket.gethostbyname(host) 
+print (host)
 port = 12345
-s.bind(("127.0.0.1", port))
+s.bind(("0.0.0.0", port))
 
 
 file_folder = os.path.dirname(os.path.realpath(__file__))
@@ -18,6 +20,12 @@ for linea in data_file:
 	data.append(linea.split(","))
 
 
+def getClient(file_name):
+	for i in data:
+		if i[0] == file_name:
+			return i[1], i[2]
+
+
 def download(name):
 	f = open(file_folder + name, 'rb')
 	line = f.read(1024)
@@ -29,19 +37,25 @@ def download(name):
 	c.send("File downloaded".encode())
 
 
-def connection(c, addr, directory):
-	print('Got connection from ' + addr)
+def connection(cl):
+	print(cl[2])
+	c = cl[0]
+	addr = cl[1]
+	directory = cl[2]
+	print('Got connection from ' + str(addr[0])+ ":" + str(addr[1]))
 	c.send("Connected to server\nfiles to download: ".encode())
 	c.send(str(directory).encode())
+	name = ""
+	search = []
 	while name != "OK":
 		name=c.recv(1024).decode()
-		for i in data:
-			if name == i[0]:
+		for i in directory:
+			if name == i:
 				c.send("OK".encode())
-				name="OK"
-				c.send(str(i.encode()))
-			if name in i[0]:
-				search.append(i[0])
+				client, port = getClient(name)
+				c.send((str(client)+":"+str(port)).encode())
+			if name in i:
+				search.append(i)
 				continue
 		c.send(str(search).encode())
 		search=[]
@@ -56,8 +70,8 @@ name=""
 while True:
 	directory=os.listdir(file_folder)
 	c, addr=s.accept()
-	connection(c, addr)
-	one = threading.Thread(target=connection)
+	x = (c, addr, directory)
+	one = threading.Thread(target=connection, args = (x, ))
 	one.start()
 
 c.close()

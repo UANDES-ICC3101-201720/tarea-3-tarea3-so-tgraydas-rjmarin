@@ -39,17 +39,24 @@ def Menu(s):
         if files == "OK":
             # implente TCP4
             name = s.recv(1024).decode()
-            print(name)
+            inf = name.split(":")
+            p2p_solitude(i[0], i[1], s, name)
             print("file found")
         else:
             print(files)
 
 
+def p2p_solitude(ip, port, s, file):
+    s.close()
+    s.connect(ip, port)
+    s.send(file.encode())
+    recive(file)
+
 def p2p():
     s_p2p = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host_p2p = socket.gethostname()
     port_p2p = 1234
-    s_p2p.bind(("127.0.0.1", port_p2p))
+    s_p2p.bind(("0.0.0.0", port_p2p))
     s_p2p.listen(5)
     while True:
         c, addr = s_p2p.accept()

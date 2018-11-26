@@ -27,7 +27,7 @@ def download(name, c):
     f = open(file_folder+"/"+name, 'rb')
     line = f.read(256)
     while line:
-        c.send(line)
+        c.send(line.encode('utf-8'))
         line = f.read(256)
     f.close()
     c.send("Sent".encode())
@@ -40,7 +40,7 @@ def printFiles(l):
         print(i.strip())
 
 def Menu(s):
-    opt = input("[1] Download\n[2] Upload\n[3] Exit\n")
+    opt = input("[1] Download\n[2] Upload\n[3] Exit\n[4] Reload\n")
     if opt == "1":
         s.send(opt.encode())
         print(s.recv(20).decode())
@@ -71,6 +71,9 @@ def Menu(s):
             print("File not found")
     elif opt == "3":
         exit()
+    elif opt == "4":
+        return 0
+
 
 
 def p2p_solitude(ip, port, file):
@@ -102,7 +105,7 @@ def client():
         port = 12345
 
         try:
-            s.connect(("192.168.0.12", port))
+            s.connect(("192.168.1.16", port))
 
         except Exception as e:
             print("Error!")
